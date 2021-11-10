@@ -9,14 +9,17 @@ import { StreamState } from 'src/app/interfaces/stream-state';
   styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit {
-  constructor(private audioService: AudioService, private cloudService: CloudService) {
+  constructor(
+    private audioService: AudioService,
+    private cloudService: CloudService
+  ) {
     // get media files
-    cloudService.getFiles().subscribe(files => {
+    cloudService.getFiles().subscribe((files) => {
       this.files = files;
     });
 
     // listen to the stream state
-    this.audioService.getState().subscribe(state => {
+    this.audioService.getState().subscribe((state) => {
       this.state = state;
     });
   }
@@ -31,14 +34,8 @@ export class PlayerComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  isFirstPlaying() {
-    return false;
-  }
-
   playStream(url: string) {
-    this.audioService.playStream(url).subscribe(events => {
-
-    });
+    this.audioService.playStream(url).subscribe((events) => {});
   }
 
   pause() {
@@ -54,32 +51,34 @@ export class PlayerComponent implements OnInit {
   }
 
   next() {
+    if(typeof this.currentFile.index != 'number') return;
     const index = this.currentFile.index + 1;
     const file = this.files[index];
     this.openFile(file, index);
   }
 
   previous() {
+    if(typeof this.currentFile.index != 'number') return;
     const index = this.currentFile.index - 1;
     const file = this.files[index];
     this.openFile(file, index);
   }
 
-  ifFirstPlaying() {
-    return this.currentFile === 0;
+  isFirstPlaying() {
+    return this.currentFile.index === 0;
   }
 
   isLastPlaying() {
-    return this.currentFile.index === this.files.length -1;
+    return this.currentFile.index === this.files.length - 1;
   }
 
   onSliderChangeEnd(change: any) {
-    this.audioService.seekTo(change.value)
+    this.audioService.seekTo(change.value);
   }
 
-  openFile(file: any, index: number){
-    this.currentFile = {index, file};
+  openFile(file: any, index: number) {
+    this.currentFile = { index, file };
     this.audioService.stop();
-    this.playStream(file.url)
+    this.playStream(file.url);
   }
 }
